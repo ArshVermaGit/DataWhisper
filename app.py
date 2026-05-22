@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 
 
 # Import custom modules
-from src.data_loader import load_data, get_dataframe_info, get_data_preview
+from src.data_loader import load_data, get_dataframe_info, get_data_preview, SUPPORTED_EXTENSIONS
 from src.eda import (
     generate_summary_stats, 
     plot_missing_values, 
@@ -105,11 +105,15 @@ def main():
 
     # 1. Upload Data
     if st.session_state.current_step == 0:
-        render_header("Upload Dataset", "Start by uploading your CSV file.", "📤")
+        render_header("Upload Dataset", "Start by uploading your data file (CSV, Excel, or JSON).", "📤")
         
         col1, col2 = st.columns([2, 1])
         with col1:
-            uploaded_file = st.file_uploader("Choose a CSV file", type=["csv"])
+            uploaded_file = st.file_uploader(
+                "Choose a data file",
+                type=[ext.lstrip(".") for ext in SUPPORTED_EXTENSIONS],
+                help="Supported formats: CSV, Excel (.xlsx/.xls), JSON"
+            )
             if uploaded_file:
                 st.session_state.uploaded_file = uploaded_file
                 df = load_data(uploaded_file)
@@ -126,7 +130,7 @@ def main():
                         st.rerun()
         
         with col2:
-            render_info_box("Instructions", "Upload a CSV file with headers. Ensure numeric columns are properly formatted for correlation analysis.")
+            render_info_box("Instructions", "Upload a CSV, Excel (.xlsx/.xls), or JSON file. Ensure numeric columns are properly formatted for correlation analysis.")
             if st.button("Load Sample Data (Titanic)", use_container_width=True):
                 st.session_state.uploaded_file = "sample_data/titanic.csv"
                 df = load_data("sample_data/titanic.csv")
